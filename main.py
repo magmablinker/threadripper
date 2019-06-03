@@ -108,12 +108,16 @@ def getImages(board, threadnumber, text_var, root, frame, photo_preview, var):
         check_mode = True
 
     for r in result_filename: # For each file in the thread
+        root.after(1000, update(root))
         filename = str(r) + result_extension[i]
         url = "http://i.4cdn.org/" + board + "/" + filename
 
         text_var.config(text=str(total_files - 1) + " images left please don't close the application!")
 
         t.append(threading.Thread(target=downloadImages, args=(url, board, threadnumber, result_title, filename, text_var, i, frame,)))
+
+        frame.update()
+        root.update()
 
         try:
             t[i].start()
@@ -162,6 +166,11 @@ def getImages(board, threadnumber, text_var, root, frame, photo_preview, var):
     text_var.config(text="Thread has successfully been downloaded.")
     messagebox.showinfo("Success", str(i) + " files have successfully been downloaded!")
 
+# Function to update root window lol
+def update(root):
+    root.update()
+
+# Default on close operation
 def on_closing(root):
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
