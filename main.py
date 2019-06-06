@@ -59,13 +59,7 @@ def getImages(board, threadnumber, text_var, root, frame, photo_preview, var):
     text = result.json()
 
     try:
-        result_title = text["posts"][0]["com"].replace(" ", "").lower().replace("/", "").replace(".", "").replace(",", "")[:4]
-
-        # Check if bad chars are in title (causes bad error message :-()
-        expression = "^[<>/\\,\.\-'\"]$"
-        if re.search(expression, result_title):
-            result_title = "title"
-
+        result_title = text["posts"][0]["semantic_url"]
     except KeyError:
         result_title = "title"
 
@@ -108,7 +102,6 @@ def getImages(board, threadnumber, text_var, root, frame, photo_preview, var):
         check_mode = True
 
     for r in result_filename: # For each file in the thread
-        root.after(1000, update(root))
         filename = str(r) + result_extension[i]
         url = "http://i.4cdn.org/" + board + "/" + filename
 
