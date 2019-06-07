@@ -1,6 +1,7 @@
 import requests
 import threading
 import os
+import shutil
 from pprint import pprint
 from time import sleep
 
@@ -52,9 +53,8 @@ class Download:
     def fetchContent(self):
         i = 0
         for board, threads in self.data_threads.items():
-            #thread_name = self.data_threads[board][i]["posts"][0]["no"]
             for thread in threads:
-                thread_name = thread["posts"][0]["no"]
+                thread_name = str(thread["posts"][0]["no"]) + "-" + thread["posts"][0]["semantic_url"]
                 url = "http://a.4cdn.org/{}/thread/{}.json".format(board, thread["posts"][0]["no"])
 
                 try:
@@ -76,7 +76,7 @@ class Download:
 
                 for post in result['posts']:
                     if "tim" in post:
-                        files.append(str(post['tim']) + post['ext'])
+                        files.append(board + "-" + str(post['tim']) + post['ext'])
 
                 self.data_images[thread_name] = [ f for f in files ]
 
@@ -100,7 +100,7 @@ class Download:
                             os.makedirs(dir_name)
                         except Exception as e:
                             print("=-=-=ERROR=-=-=",
-                                  "Making directory {} failed".format(dir_name)
+                                  "Making directory {} failed".format(dir_name),
                                   "=-=-=-=-=-=-=-=", sep="\n")
                             continue
 
@@ -109,9 +109,24 @@ class Download:
     def downloadImages(self):
         self.createDirectories()
 
-        for thread, posts in self.data_images.items()
-            for post in posts:
-                
+        for thread, posts in self.data_images.items():
+            for file in posts:
+                no = file.find("-")
+                board = file[0:no]
+                filename = file[(no+1):]
+                url = "http://i.4cdn.org/{}/{}".format(board, filename)
+
+                try:
+                    result = requests.get(url, stream=True)
+                except Exception as e:
+                    continue
+
+                with open("images/" + board + "/" + thread + "/" + filename, 'wb') as f:
+                    print("images/" + board + "/" + thread + "/" + filename)
+                    shutil.copyfileobj(result.raw, f)
+                    f.close()
+
+
 
 def main():
     # Create new instance
