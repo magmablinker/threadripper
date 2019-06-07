@@ -9,7 +9,7 @@ from time import sleep
 class Download:
     def __init__(self):
         self.error = []
-        self.boards = [ line.rstrip("\n") for line in open("boards2.txt") ]
+        self.boards = [ line.rstrip("\n") for line in open("boards_custom.txt") ]
         self.data_threads = {}
         self.data_images = {}
 
