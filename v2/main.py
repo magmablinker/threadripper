@@ -6,6 +6,8 @@ import re
 from pprint import pprint
 from time import sleep
 
+os.system("cls")
+
 class Download:
     def __init__(self):
         self.error = []
@@ -40,9 +42,7 @@ class Download:
 
             result = result.json()
 
-            pattern = "[\bcock\b \bdick\b]"
-
-            self.data_threads[board] = [ thread for thread in result["threads"] if re.search(pattern, thread["posts"][0]["semantic_url"]) != True ]
+            self.data_threads[board] = [ thread for thread in result["threads"] if "cock" not in thread["posts"][0]["semantic_url"] and "dick" not in thread["posts"][0]["semantic_url"] and "trap" not in thread["posts"][0]["semantic_url"] ]
 
             print(
                 "***************************************************",
@@ -126,14 +126,13 @@ class Download:
             filename = file[(no+1):]
             url = "http://i.4cdn.org/{}/{}".format(board, filename)
 
-            try:
-                result = requests.get(url, stream=True)
-            except Exception as e:
-                continue
-
             path = "images/" + board + "/" + thread + "/" + filename
-
             if not os.path.exists(path) and not os.path.isdir(path):
+                try:
+                    result = requests.get(url, stream=True)
+                except Exception as e:
+                    continue
+
                 print("Writing image {} to file".format(path))
                 with open(path, 'wb') as f:
                     shutil.copyfileobj(result.raw, f)
