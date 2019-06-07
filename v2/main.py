@@ -145,13 +145,10 @@ def main():
     # Create new instance
     download = Download()
 
-    if not download.fetchImages():
-        if not download.downloadImages():
-            pass
-        else:
-            pass
-    else:
-        pass
+    download.fetchImages():
+    download.downloadImages():
+
+    print("=-=-=DONE=-=-=")
 
 if __name__ == "__main__":
     main()
