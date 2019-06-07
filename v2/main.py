@@ -1,5 +1,6 @@
 import requests
 import threading
+import os
 from pprint import pprint
 from time import sleep
 
@@ -50,30 +51,17 @@ class Download:
 
     def fetchContent(self):
         i = 0
-        t = []
         for board, threads in self.data_threads.items():
-            thread_name = self.data_threads[board][i]["posts"][0]["no"]
-            t.append(threading.Thread(target=self.fetchPosts, args=(threads, i, thread_name, board,)))
-            t[i].start()
-
-            if (i%5) == 0:
-                t[i].join()
-
-            print(
-                "***************************************************",
-                "Done fetching data for thread {} on board /{}/".format(thread_name, board),
-                "***************************************************", sep="\n")
-            i += 1
-
-    def fetchPosts(self, threads, i, thread_name, board):
+            #thread_name = self.data_threads[board][i]["posts"][0]["no"]
             for thread in threads:
+                thread_name = thread["posts"][0]["no"]
                 url = "http://a.4cdn.org/{}/thread/{}.json".format(board, thread["posts"][0]["no"])
 
                 try:
                     result = requests.get(url)
                 except Exception as e:
                     print("=-=-=ERROR=-=-=",
-                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"][0]["no"], board),
+                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"]["no"], board),
                           "=-=-=-=-=-=-=-=", sep="\n")
                     continue
 
@@ -84,14 +72,46 @@ class Download:
 
                 files = []
 
+                print(thread_name)
+
                 for post in result['posts']:
                     if "tim" in post:
                         files.append(str(post['tim']) + post['ext'])
 
                 self.data_images[thread_name] = [ f for f in files ]
 
+            i += 1
+
+            print(
+                "***************************************************",
+                "Done fetching data for thread {} on board /{}/".format(thread_name, board),
+                "***************************************************", sep="\n")
+
+    def createDirectories(self):
+        i = 0
+        for board, threads in self.data_threads.items():
+            for thread in threads:
+                dir_name = "images/" + board + "/" + str(thread["posts"][0]["no"]) + "-" + thread["posts"][0]["semantic_url"]
+
+                print(dir_name)
+
+                if not os.path.exists(dir_name) and not os.path.isdir(dir_name):
+                        try:
+                            os.makedirs(dir_name)
+                        except Exception as e:
+                            print("=-=-=ERROR=-=-=",
+                                  "Making directory {} failed".format(dir_name)
+                                  "=-=-=-=-=-=-=-=", sep="\n")
+                            continue
+
+                i += 1
+
     def downloadImages(self):
-        pass
+        self.createDirectories()
+
+        for thread, posts in self.data_images.items()
+            for post in posts:
+                
 
 def main():
     # Create new instance
