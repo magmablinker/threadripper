@@ -37,7 +37,7 @@ class Download:
 
             result = result.json()
 
-            self.data_threads[board] = [ thread for thread in result['threads'][0]['posts'] ]
+            self.data_threads[board] = [ thread for thread in result['threads'] ]
 
             print(
                 "***************************************************",
@@ -50,18 +50,30 @@ class Download:
 
     def fetchContent(self):
         i = 0
+        t = []
         for board, threads in self.data_threads.items():
-            print(board)
-            pprint(self.data_threads)
-            thread_name = self.data_threads[board]["no"][i]
+            thread_name = self.data_threads[board][i]["posts"][0]["no"]
+            t.append(threading.Thread(target=self.fetchPosts, args=(threads, i, thread_name, board,)))
+            t[i].start()
+
+            if (i%5) == 0:
+                t[i].join()
+
+            print(
+                "***************************************************",
+                "Done fetching data for thread {} on board /{}/".format(thread_name, board),
+                "***************************************************", sep="\n")
+            i += 1
+
+    def fetchPosts(self, threads, i, thread_name, board):
             for thread in threads:
-                url = "http://a.4cdn.org/{}/thread/{}.json".format(board, thread["no"])
+                url = "http://a.4cdn.org/{}/thread/{}.json".format(board, thread["posts"][0]["no"])
 
                 try:
                     result = requests.get(url)
                 except Exception as e:
                     print("=-=-=ERROR=-=-=",
-                          "Fetching images for thread {} on board {} failed, skipping".format(thread["no"], board),
+                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"][0]["no"], board),
                           "=-=-=-=-=-=-=-=", sep="\n")
                     continue
 
@@ -77,16 +89,6 @@ class Download:
                         files.append(str(post['tim']) + post['ext'])
 
                 self.data_images[thread_name] = [ f for f in files ]
-
-                print(self.data_images[thread_name])
-
-                print(
-                    "***************************************************",
-                    "Done fetching data for thread {} on board /{}/, sleeping one second".format(thread_name, board),
-                    "***************************************************", sep="\n")
-
-                sleep(1)
-            i += 1
 
     def downloadImages(self):
         pass
