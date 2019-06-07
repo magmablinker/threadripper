@@ -127,7 +127,7 @@ class Download:
             url = "http://i.4cdn.org/{}/{}".format(board, filename)
 
             path = "images/" + board + "/" + thread + "/" + filename
-            if not os.path.exists(path) and not os.path.isdir(path):
+            if not os.path.exists(path) and not os.path.isfile(path):
                 try:
                     result = requests.get(url, stream=True)
                 except Exception as e:
