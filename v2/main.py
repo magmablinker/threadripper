@@ -145,8 +145,8 @@ def main():
     # Create new instance
     download = Download()
 
-    download.fetchImages():
-    download.downloadImages():
+    download.fetchImages()
+    download.downloadImages()
 
     print("=-=-=DONE=-=-=")
 
