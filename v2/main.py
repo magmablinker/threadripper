@@ -2,6 +2,7 @@ import requests
 import threading
 import os
 import shutil
+import re
 from pprint import pprint
 from time import sleep
 
@@ -39,7 +40,9 @@ class Download:
 
             result = result.json()
 
-            self.data_threads[board] = [ thread for thread in result['threads'] ]
+            pattern = "[\bcock\b \bdick\b]"
+
+            self.data_threads[board] = [ thread for thread in result["threads"] if re.search(pattern, thread["posts"][0]["semantic_url"]) != True ]
 
             print(
                 "***************************************************",
@@ -93,8 +96,6 @@ class Download:
             for thread in threads:
                 dir_name = "images/" + board + "/" + str(thread["posts"][0]["no"]) + "-" + thread["posts"][0]["semantic_url"]
 
-                print(dir_name)
-
                 if not os.path.exists(dir_name) and not os.path.isdir(dir_name):
                         try:
                             os.makedirs(dir_name)
@@ -109,23 +110,36 @@ class Download:
     def downloadImages(self):
         self.createDirectories()
 
+        t = []
+        i = 0
+
         for thread, posts in self.data_images.items():
-            for file in posts:
-                no = file.find("-")
-                board = file[0:no]
-                filename = file[(no+1):]
-                url = "http://i.4cdn.org/{}/{}".format(board, filename)
+            t.append(threading.Thread(target=self.writeImages, args=(posts, thread,)))
+            t[i].start()
 
-                try:
-                    result = requests.get(url, stream=True)
-                except Exception as e:
-                    continue
+            i += 1
 
-                with open("images/" + board + "/" + thread + "/" + filename, 'wb') as f:
-                    print("images/" + board + "/" + thread + "/" + filename)
+    def writeImages(self, posts, thread):
+        for file in posts:
+            no = file.find("-")
+            board = file[0:no]
+            filename = file[(no+1):]
+            url = "http://i.4cdn.org/{}/{}".format(board, filename)
+
+            try:
+                result = requests.get(url, stream=True)
+            except Exception as e:
+                continue
+
+            path = "images/" + board + "/" + thread + "/" + filename
+
+            if not os.path.exists(path) and not os.path.isdir(path):
+                print("Writing image {} to file".format(path))
+                with open(path, 'wb') as f:
                     shutil.copyfileobj(result.raw, f)
                     f.close()
-
+            else:
+                print("Skipping file {}, exists".format(path))
 
 
 def main():
