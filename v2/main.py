@@ -3,7 +3,6 @@ import threading
 import os
 import shutil
 import re
-from pprint import pprint
 from time import sleep
 
 os.system("cls")
