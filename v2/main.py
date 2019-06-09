@@ -1,8 +1,8 @@
 import requests
 import threading
 import os
-import shutil
 import re
+import urllib.request
 from time import sleep
 
 os.system("cls")
@@ -127,15 +127,19 @@ class Download:
 
             path = "images/" + board + "/" + thread + "/" + filename
             if not os.path.exists(path) and not os.path.isfile(path):
-                try:
-                    result = requests.get(url, stream=True)
-                except Exception as e:
-                    continue
+                #try:
+                #    result = requests.get(url, stream=True)
+                #except Exception as e:
+                #    continue
 
                 print("Writing image {} to file".format(path))
-                with open(path, 'wb') as f:
-                    shutil.copyfileobj(result.raw, f)
-                    f.close()
+                try:
+                    urllib.request.urlretrieve(url, path)
+                except Exception as e:
+                    continue
+                #with open(path, 'wb') as f:
+                #    shutil.copyfileobj(result.raw, f)
+                #    f.close()
             else:
                 print("Skipping file {}, exists".format(path))
 
