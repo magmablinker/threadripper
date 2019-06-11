@@ -109,6 +109,12 @@ class Download:
     def downloadImages(self):
         self.createDirectories()
 
+        print("******************************************",
+              "Found {} images, downloading in 2 seconds.".format(sum(len(v) for v in self.data_images.values())),
+              "******************************************", sep="\n")
+
+        sleep(2)
+
         t = []
         i = 0
 
@@ -127,19 +133,11 @@ class Download:
 
             path = "images/" + board + "/" + thread + "/" + filename
             if not os.path.exists(path) and not os.path.isfile(path):
-                #try:
-                #    result = requests.get(url, stream=True)
-                #except Exception as e:
-                #    continue
-
                 print("Writing image {} to file".format(path))
                 try:
                     urllib.request.urlretrieve(url, path)
                 except Exception as e:
                     continue
-                #with open(path, 'wb') as f:
-                #    shutil.copyfileobj(result.raw, f)
-                #    f.close()
             else:
                 print("Skipping file {}, exists".format(path))
 
