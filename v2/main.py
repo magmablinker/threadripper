@@ -157,12 +157,13 @@ class Download:
 
         for thread, posts in self.data_images.items():
             for (image, comment) in zip(posts['images'], posts['comments']):
-                t.append(threading.Thread(target=self.writeImages, args=(image, comment, thread,)))
+                t.append(threading.Thread(target=self.writeImages, args=(image, comment, thread, i,)))
                 t[i].start()
                 i += 1
+                
         t[i-1].join()
 
-    def writeImages(self, image, comment, thread):
+    def writeImages(self, image, comment, thread, i):
         if image != None:
             no = image.find("-")
             board = image[0:no]
@@ -176,7 +177,7 @@ class Download:
                 try:
                     urllib.request.urlretrieve(url, path)
                     with open(path, "rb") as image_file:
-                        encoded_image = base64.b64encode(image_file.read()).decode("UTF-8")
+                        encoded_image = db.escape_string(base64.b64encode(image_file.read()))
                     os.unlink(path)
                 except Exception as e:
                     exit(1)
@@ -184,16 +185,16 @@ class Download:
                 print("Inserting image {} into db".format(path))
                 try:
                     insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
-                    print(insert_query)
                     self.cur.execute(insert_query)
-                    cid = self.db.insert_id()
-                    insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(cid, encoded_image)
-                    print(insert_query)
+                    if not i == 0:
+                        cid = self.db.insert_id()
+                    else:
+                        cid = self.cur.execute("SELECT cid FROM comments ORDER BY cid DESC LIMIT 1")
+                    insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), encoded_image)
                     self.cur.execute(insert_query)
                 except Exception as e:
-                    print(self.db.insert_id())
+                    print(e)
                     print("DB Insert failed!")
-                    exit(1)
             else:
                 print("Skipping file {}, exists".format(path))
 
