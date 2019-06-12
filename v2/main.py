@@ -184,12 +184,14 @@ class Download:
                 print("Inserting image {} into db".format(path))
                 try:
                     insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
+                    print(insert_query)
                     self.cur.execute(insert_query)
-                    cid = self.cur.lastrowid
+                    cid = self.db.insert_id()
                     insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(cid, encoded_image)
+                    print(insert_query)
                     self.cur.execute(insert_query)
                 except Exception as e:
-                    print(e)
+                    print(self.db.insert_id())
                     print("DB Insert failed!")
                     exit(1)
             else:
