@@ -98,7 +98,10 @@ class Download:
 
                 for post in result['posts']:
                     if "tim" in post:
-                        files.append(board + "-" + str(post['tim']) + post['ext'])
+                        if ".webm" not in ext:
+                            files.append(board + "-" + str(post['tim']) + post['ext'])
+                        else:
+                            files.append("WEBM!")
                     else:
                         files.append(None)
                     if "com" in post:
