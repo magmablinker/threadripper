@@ -160,7 +160,7 @@ class Download:
                 t.append(threading.Thread(target=self.writeImages, args=(image, comment, thread,)))
                 t[i].start()
                 i += 1
-        t[i].join()
+        t[i-1].join()
 
     def writeImages(self, image, comment, thread):
         if image != None:
@@ -195,18 +195,12 @@ class Download:
             else:
                 print("Skipping file {}, exists".format(path))
 
-    def __del__(self):
-        print("Instance DELETED!!!!!!!!!!!!!!!!!")
-        self.curr.close()
-
 def main():
     # Create new instance
     download = Download()
 
     download.fetchImages()
     download.downloadImages()
-
-    del download
 
 if __name__ == "__main__":
     main()
