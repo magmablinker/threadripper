@@ -37,6 +37,9 @@ class Download:
                 continue
 
             if result.status_code != 200:
+                print("=-=-=ERROR=-=-=",
+                      "Fetching board /{}/ returned stauts code {}".format(board, result.status_code),
+                      "=-=-=-=-=-=-=-=", sep="\n")
                 continue
 
             result = result.json()
