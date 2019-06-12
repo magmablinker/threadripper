@@ -160,7 +160,7 @@ class Download:
                 t.append(threading.Thread(target=self.writeImages, args=(image, comment, thread, i,)))
                 t[i].start()
                 i += 1
-                
+
         t[i-1].join()
 
     def writeImages(self, image, comment, thread, i):
@@ -177,7 +177,7 @@ class Download:
                 try:
                     urllib.request.urlretrieve(url, path)
                     with open(path, "rb") as image_file:
-                        encoded_image = db.escape_string(base64.b64encode(image_file.read()))
+                        encoded_image = db.escape_string(image_file.read())
                     os.unlink(path)
                 except Exception as e:
                     exit(1)
