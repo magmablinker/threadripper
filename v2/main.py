@@ -97,8 +97,9 @@ class Download:
                 comments = []
 
                 for post in result['posts']:
+                    i = 0
                     if "tim" in post:
-                        if ".webm" not in ext:
+                        if ".webm" not in post['ext']:
                             files.append(board + "-" + str(post['tim']) + post['ext'])
                         else:
                             files.append("WEBM!")
@@ -179,27 +180,29 @@ class Download:
                 print("Writing image {} to file".format(path))
                 try:
                     urllib.request.urlretrieve(url, path)
-                    with open(path, "rb") as image_file:
-                        encoded_image = db.escape_string(image_file.read())
-                    os.unlink(path)
                 except Exception as e:
                     exit(1)
 
                 print("Inserting image {} into db".format(path))
                 try:
                     insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
+                    print(insert_query)
                     self.cur.execute(insert_query)
                     if not i == 0:
                         cid = self.db.insert_id()
                     else:
                         cid = self.cur.execute("SELECT cid FROM comments ORDER BY cid DESC LIMIT 1")
-                    insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), encoded_image)
+                    insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
+                    print(insert_query)
                     self.cur.execute(insert_query)
                 except Exception as e:
                     print(e)
                     print("DB Insert failed!")
             else:
                 print("Skipping file {}, exists".format(path))
+
+    def insertIntoDB(self):
+        pass
 
 def main():
     # Create new instance
