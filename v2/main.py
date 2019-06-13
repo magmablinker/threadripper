@@ -101,7 +101,7 @@ class Download:
                         if ".webm" not in post['ext']:
                             files.append(board + "-" + str(post['tim']) + post['ext'])
                         else:
-                            files.append("WEBM!")
+                            files.append("{}-".format(board))
                     else:
                         files.append(None)
                     if "com" in post:
@@ -155,38 +155,43 @@ class Download:
 
         sleep(2)
 
+        #for threads, posts in self.data_images.items():
+            #for (image, comment) in zip(posts['images'], posts['comments']):
+                #i = 0
+                #t = []
+                #while i < 7:
+                #    t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
+                #    t[i].start()
+                #    i += 1
+                #for thread in t:
+                #    thread.join()
+            #for thread in t: # Wait for threads to finish
+            #    print("Joining thread!")
+            #    thread.join()
+
         t = []
         i = 0
 
-        for thread, posts in self.data_images.items():
+        for threads, posts in self.data_images.items():
             for (image, comment) in zip(posts['images'], posts['comments']):
-                t.append(threading.Thread(target=self.writeImages, args=(image, comment, thread,)))
-                t[i].start()
-                i += 1
-            for thread in t: # Wait for threads to finish
-                print("Joining thread!")
-                thread.join()
-
-        t = []
-        i = 0
-
-        for thread, posts in self.data_images.items():
-            for (image, comment) in zip(posts['images'], posts['comments']):
-                t.append(threading.Thread(target=self.insertIntoDB, args=(image, comment, i,)))
+                t.append(threading.Thread(target=self.insertIntoDB, args=(image, comment, threads, i,)))
                 t[i].start()
                 i += 1
             for thread in t: # Wait for threads to finish
                 thread.join()
             print("All threads joined")
 
-    def writeImages(self, image, comment, thread):
+        print("Closing DB!!")
+        self.cur.close()
+
+    def writeImages(self, image, comment, threads):
         if image != None:
             no = image.find("-")
             board = image[0:no]
             filename = image[(no+1):]
-            threadno = int(thread[0:thread.find("-")])
+            threadno = int(threads[0:threads.find("-")])
             url = "http://i.4cdn.org/{}/{}".format(board, filename)
-            path = "images/" + board + "/" + thread + "/" + filename
+            path = "images/" + board + "/" + threads + "/" + filename
 
             if not os.path.exists(path) and not os.path.isfile(path):
                 print("Writing image {} to file".format(path))
@@ -197,27 +202,30 @@ class Download:
             else:
                 print("Skipping file {}, exists".format(path))
 
-    def insertIntoDB(self, image, comment, i):
-        no = image.find("-")
-        board = image[0:no]
-        filename = image[(no+1):]
-        threadno = int(thread[0:thread.find("-")])
-        path = "images/" + board + "/" + thread + "/" + filename
+    def insertIntoDB(self, image, comment, threads, i):
+        if image != None:
+            no = image.find("-")
+            board = image[0:no]
+            filename = image[(no+1):]
+            threadno = int(threads[0:threads.find("-")])
+            path = "images/" + board + "/" + threads + "/" + filename
 
-        print("Inserting image {} into db".format(path))
-        try:
-            insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
-            self.cur.execute(insert_query)
+            print("Inserting image {} into db".format(path))
+            try:
+                insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
+                self.cur.execute(insert_query)
 
-            if not i == 0: # Get the id of the latest db entry
-                cid = self.db.insert_id()
-            else:
-                cid = self.cur.execute("SELECT cid FROM comments ORDER BY cid DESC LIMIT 1")
+                if not i == 0: # Get the id of the latest db entry
+                    cid = self.db.insert_id()
+                else:
+                    cid = self.cur.execute("SELECT cid FROM comments ORDER BY cid DESC LIMIT 1")
 
-            insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
-            self.cur.execute(insert_query)
-        except Exception as e:
-            print("DB Insert failed!")
+                insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
+                self.cur.execute(insert_query)
+            except Exception as e:
+                print("DB Insert failed!")
+        else:
+            print("Skipping None file")
 
     def displayMessage(self, type, error):
         types = [ 0, 1, 2 ] # 0 = Succes; 1 = Error; 2 = Warning
