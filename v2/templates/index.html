@@ -2,7 +2,37 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Random Image</title>
+    <script type="text/javascript">
+
+      window.onload = function(){
+        loadData("http://127.0.0.1:5000/api/image/random/");
+      };
+
+      function loadData(url) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", url, true);
+        xhttp.send();
+        xhttp.onreadystatechange = function() {
+          if (this.status = 200) {
+            window.jsondata = JSON.parse(this.responseText);
+            const b64 = jsondata[3];
+            var img = document.getElementById("img");
+            img.setAttribute('src', "data:image/jpg;base64," + b64)
+          }
+        };
+      }
+
+      function newImage(type) {
+        var nextId = window.jsondata[0];
+        if(type == 0) {  // Next image
+          nextId++;
+        } else { // Previous image
+          nextId--;
+        }
+        loadData("http://127.0.0.1:5000/api/image/" + nextId);
+      }
+    </script>
     <style media="screen">
 
       * {
@@ -24,15 +54,31 @@
         margin: auto;
       }
 
+      .container-image {
+        width: 400px;
+        margin: auto;
+      }
+
       .column {
         display: grid;
         grid-template-columns: 33% 33% 33%;
       }
 
+      .large {
+        grid-template-columns: 99%;
+      }
+
+      .medium {
+        grid-template-columns: 49.5% 49.5%;
+      }
+
       .row {
         padding: 8px;
-        border: 2px solid white;
         word-wrap: break-word;
+      }
+
+      .info, .header {
+        border: 2px solid white;
       }
 
       .header {
@@ -40,14 +86,8 @@
         font-weight: bold;
       }
 
-      #img {
-        max-width: 80%;
-        height: auto;
-        padding: 8px;
-      }
-
-      #btn {
-        width: 98.9%;
+      .btn {
+        width: 100%;
         border: 2px solid white;
         padding: 8px;
         margin-bottom: 2%;
@@ -57,10 +97,26 @@
         transition: background-color 2s ease-in;
       }
 
-      #btn:hover {
+      .btn:hover {
         cursor: pointer;
         background-color: rgba(255, 255, 255, 0.5);
         transition: background-color 2s ease-out;
+      }
+
+      .controll {
+        height: 100%;
+        width: 100%;
+      }
+
+      .l {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      #img {
+        max-width: 90%;
+        max-height: 90%;
       }
 
     </style>
@@ -68,7 +124,6 @@
   <body>
     <div class="container">
       <h1>This API is simply EPIC!</h1>
-      <button id="btn" type="button" name="button" onClick="location.reload()">Suprise me</button>
       <div class="column">
         <div class="row header">
           API route
@@ -81,41 +136,47 @@
         </div>
       </div>
       <div class="column">
-        <div class="row">
+        <div class="row info">
           /api/image/random/
         </div>
-        <div class="row">
+        <div class="row info">
           Returns a random image
         </div>
-        <div class="row">
+        <div class="row info">
           JSON Data/Base64
         </div>
       </div>
       <div class="column">
-        <div class="row">
+        <div class="row info">
           /api/image/id/
         </div>
-        <div class="row">
+        <div class="row info">
           Returns the image with the id
         </div>
-        <div class="row">
+        <div class="row info">
           JSON Data/Base64
         </div>
       </div>
-      <img id="img" src="" alt="randompic">
+      <div class="column large">
+        <div class="row">
+          <button class="btn l" type="button" name="button" onclick="loadData('http://127.0.0.1:5000/api/image/random/')">Suprise me</button>
+        </div>
+      </div>
+      <div class="column medium">
+        <div class="row">
+          <button class="btn controll" type="button" name="button" onclick="newImage(1);">Previous</button>
+        </div>
+        <div class="row">
+          <button class="btn controll" type="button" name="button" onclick="newImage(0);">Next</button>
+        </div>
+      </div>
+      <div class="column large">
+        <div class="row">
+          <div class="container-image">
+            <img id="img" src="" alt="randompic">
+          </div>
+        </div>
+      </div>
     </div>
-    <script type="text/javascript">
-      var xhttp = new XMLHttpRequest();
-      xhttp.open("GET", "http://127.0.0.1:5000/api/image/random/", true);
-      xhttp.send();
-      xhttp.onreadystatechange = function() {
-        if (this.status = 200) {
-          var jsondata = JSON.parse(this.responseText);
-          const b64 = jsondata[3];
-          var img = document.getElementById("img");
-          img.setAttribute('src', "data:image/jpg;base64," + b64)
-        }
-      };
-    </script>
   </body>
 </html>

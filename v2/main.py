@@ -115,13 +115,12 @@ class Download:
                 self.data_images[thread_name]['comments'] = comments
 
                 # Insert query
+                print("[+] Inserting {} into DB".format(int(thread["posts"][0]["no"])))
                 try:
                     insert_query = "INSERT INTO threads(thread_no, thread_title) VALUES({}, '{}')".format(int(thread["posts"][0]["no"]), thread["posts"][0]["semantic_url"])
-                    print(insert_query)
                     self.cur.execute(insert_query)
                 except Exception as e:
-                    print(e)
-                    print("IDIOT DB FAILED")
+                    print("[!] Post exists in database or failed!")
 
             print(
                 "***************************************************",
@@ -169,7 +168,8 @@ class Download:
             for (image, comment) in zip(posts['images'], posts['comments']):
                 self.insertIntoDB(image, comment, threads, i)
                 i += 1
-        print("Done!\nClosing DB!!")
+        print("[+] Inserts done, some files may still be processing")
+        print("[+] Closing database connection")
         self.cur.close()
 
     def writeImages(self, image, comment, threads):
@@ -182,15 +182,21 @@ class Download:
             path = "images/" + board + "/" + threads + "/" + filename
 
             if not os.path.exists(path) and not os.path.isfile(path):
-                print("Writing image {} to file".format(path))
+                print("[+] Writing image {} to file".format(path))
                 try:
-                    res = req.get(url, stream=True)
-                    with open(path, "wb") as f:
-                        shutil.copyfileobj(res.raw, f)
+                    res = requests.get(url, stream=True)
+
+                    if res.status_code == 200:
+                        with open(path, "wb") as f:
+                            shutil.copyfileobj(res.raw, f)
+                    else:
+                        pass
                 except Exception as e:
-                    pass
+                    print("[-] Writing file failed")
+                    self.data_images.pop(image)
+                print("[+] Done writing file {}".format(path))
             else:
-                print("Skipping file {}, exists".format(path))
+                print("[!] Skipping file {}, exists".format(path))
 
     def insertIntoDB(self, image, comment, threads, i):
         if image != None:
@@ -200,7 +206,7 @@ class Download:
             threadno = int(threads[0:threads.find("-")])
             path = "images/" + board + "/" + threads + "/" + filename
 
-            print("Inserting image {} into db".format(path))
+            print("[+] Inserting image {} into db".format(path))
             try:
                 insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
                 self.cur.execute(insert_query)
@@ -213,9 +219,9 @@ class Download:
                 insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
                 self.cur.execute(insert_query)
             except Exception as e:
-                print("DB Insert failed!")
+                print("[-] DB Insert failed!")
         else:
-            print("Skipping None file")
+            print("[!] Skipping None file")
 
     def displayMessage(self, type, error):
         types = [ 0, 1, 2 ] # 0 = Succes; 1 = Error; 2 = Warning
