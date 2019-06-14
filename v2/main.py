@@ -2,9 +2,8 @@ import requests
 import threading
 import os
 import re
-import urllib.request
+import shutil
 import pymysql
-import base64
 from pprint import pprint
 from time import sleep
 
@@ -185,7 +184,9 @@ class Download:
             if not os.path.exists(path) and not os.path.isfile(path):
                 print("Writing image {} to file".format(path))
                 try:
-                    urllib.request.urlretrieve(url, path)
+                    res = req.get(url, stream=True)
+                    with open(path, "wb") as f:
+                        shutil.copyfileobj(res.raw, f)
                 except Exception as e:
                     pass
             else:
