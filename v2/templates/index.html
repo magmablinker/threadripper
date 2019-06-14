@@ -20,7 +20,10 @@
       }
 
       body {
-        background-image: url("{{ url_for('static', filename='img/body.jpg') }}");
+        /*background-image: url("{{ url_for('static', filename='img/body.jpg') }}");*/
+        background-image: url("{{ url_for('static', filename='img/b4.jpeg') }}");
+        background-position: center;
+        background-color: black;
       }
 
       h1 {
@@ -38,7 +41,9 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 16px;
-        background-image: url("{{ url_for('static', filename='img/head.png') }}")
+        background-color: rgba(0, 0, 120, 0.8);
+        border-bottom: 4px solid white;
+        /*background-image: url("{{ url_for('static', filename='img/head.png') }}")*/
       }
 
       .container {
@@ -82,11 +87,17 @@
       .info,
       .header {
         border: 2px solid white;
+        border-radius: 32px;
+        margin: 4px;
       }
 
       .header {
-        background-color: gray;
+        background-color: rgba(0, 0, 139, 0.8);
         font-weight: bold;
+      }
+
+      .info {
+        background-color: RoyalBlue;
       }
 
       .btn {
@@ -218,7 +229,7 @@
   </head>
   <body>
     <div class="head">
-      <h1>This API is simply EPIC!</h1>
+      <h1>Random Image API!</h1>
     </div>
     <div class="container">
       <div class="column">
