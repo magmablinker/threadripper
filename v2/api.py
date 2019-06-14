@@ -1,4 +1,5 @@
 import pymysql
+import base64
 from flask import Flask
 from flask import jsonify
 from flask import render_template
@@ -29,7 +30,10 @@ def index():
 def random():
     query = "SELECT * FROM images ORDER BY RAND() LIMIT 1"
     cur.execute(query)
-    return jsonify(cur.fetchone())
+    val = cur.fetchone()
+    val = [ v for v in val ]
+    val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+    return jsonify(val)
 
 @app.route("/api/image/<id>", methods=['GET'])
 def getById(id):
@@ -38,6 +42,8 @@ def getById(id):
     cur.execute(query)
     if cur.rowcount == 1:
         val = cur.fetchone()
+        val = [ v for v in val ]
+        val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
     else:
         val = {"error": "No entrys found!"}
     return jsonify(val)

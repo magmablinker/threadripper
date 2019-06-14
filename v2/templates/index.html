@@ -8,10 +8,15 @@
       * {
         font-family: Arial, sans-serif;
         text-align: center;
+        color: white;
       }
 
       html, body {
         margin: 0;
+      }
+
+      body {
+        background-color: black;
       }
 
       .container {
@@ -26,12 +31,36 @@
 
       .row {
         padding: 8px;
-        border: 2px solid black;
+        border: 2px solid white;
         word-wrap: break-word;
       }
 
       .header {
         background-color: gray;
+        font-weight: bold;
+      }
+
+      #img {
+        max-width: 80%;
+        height: auto;
+        padding: 8px;
+      }
+
+      #btn {
+        width: 98.9%;
+        border: 2px solid white;
+        padding: 8px;
+        margin-bottom: 2%;
+        margin-left: -6px;
+        color: white;
+        background-color: gray;
+        transition: background-color 2s ease-in;
+      }
+
+      #btn:hover {
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.5);
+        transition: background-color 2s ease-out;
       }
 
     </style>
@@ -39,6 +68,7 @@
   <body>
     <div class="container">
       <h1>This API is simply EPIC!</h1>
+      <button id="btn" type="button" name="button" onClick="location.reload()">Suprise me</button>
       <div class="column">
         <div class="row header">
           API route
@@ -58,7 +88,7 @@
           Returns a random image
         </div>
         <div class="row">
-          JSON Data
+          JSON Data/Base64
         </div>
       </div>
       <div class="column">
@@ -69,9 +99,23 @@
           Returns the image with the id
         </div>
         <div class="row">
-          JSON Data
+          JSON Data/Base64
         </div>
       </div>
+      <img id="img" src="" alt="randompic">
     </div>
+    <script type="text/javascript">
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("GET", "http://127.0.0.1:5000/api/image/random/", true);
+      xhttp.send();
+      xhttp.onreadystatechange = function() {
+        if (this.status = 200) {
+          var jsondata = JSON.parse(this.responseText);
+          const b64 = jsondata[3];
+          var img = document.getElementById("img");
+          img.setAttribute('src', "data:image/jpg;base64," + b64)
+        }
+      };
+    </script>
   </body>
 </html>
