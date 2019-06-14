@@ -84,7 +84,7 @@ class Download:
                     result = requests.get(url)
                 except Exception as e:
                     print("=-=-=ERROR=-=-=",
-                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"]["no"], board),
+                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"][0]["no"], board),
                           "=-=-=-=-=-=-=-=", sep="\n")
                     continue
 
@@ -155,33 +155,22 @@ class Download:
 
         sleep(2)
 
-        #for threads, posts in self.data_images.items():
-            #for (image, comment) in zip(posts['images'], posts['comments']):
-                #i = 0
-                #t = []
-                #while i < 7:
-                #    t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
-                #    t[i].start()
-                #    i += 1
-                #for thread in t:
-                #    thread.join()
-            #for thread in t: # Wait for threads to finish
-            #    print("Joining thread!")
-            #    thread.join()
-
+        i = 0
         t = []
+
+        for threads, posts in self.data_images.items():
+            for (image, comment) in zip(posts['images'], posts['comments']):
+                t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
+                t[i].start()
+                i += 1
+
         i = 0
 
         for threads, posts in self.data_images.items():
             for (image, comment) in zip(posts['images'], posts['comments']):
-                t.append(threading.Thread(target=self.insertIntoDB, args=(image, comment, threads, i,)))
-                t[i].start()
+                self.insertIntoDB(image, comment, threads, i)
                 i += 1
-            for thread in t: # Wait for threads to finish
-                thread.join()
-            print("All threads joined")
-
-        print("Closing DB!!")
+        print("Done!\nClosing DB!!")
         self.cur.close()
 
     def writeImages(self, image, comment, threads):
