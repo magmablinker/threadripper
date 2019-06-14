@@ -74,6 +74,12 @@
         grid-template-columns: 49.5% 49.5%;
       }
 
+      .api-info {
+        background-color: rgba(0, 0, 230, 0.5);
+        border-radius: 16px;
+        padding: 4px;
+      }
+
       .row {
         padding: 8px;
         word-wrap: break-word;
@@ -232,37 +238,39 @@
       <h1>Random Image API!</h1>
     </div>
     <div class="container">
-      <div class="column">
-        <div class="row header">
-          API route
+      <div class="api-info">
+        <div class="column colored">
+          <div class="row header">
+            API route
+          </div>
+          <div class="row header">
+            Purpose
+          </div>
+          <div class="row header">
+            Return value
+          </div>
         </div>
-        <div class="row header">
-          Purpose
+        <div class="column colored">
+          <div class="row info">
+            /api/image/random/
+          </div>
+          <div class="row info">
+            Returns a random image
+          </div>
+          <div class="row info">
+            JSON Data/Base64
+          </div>
         </div>
-        <div class="row header">
-          Return value
-        </div>
-      </div>
-      <div class="column">
-        <div class="row info">
-          /api/image/random/
-        </div>
-        <div class="row info">
-          Returns a random image
-        </div>
-        <div class="row info">
-          JSON Data/Base64
-        </div>
-      </div>
-      <div class="column">
-        <div class="row info">
-          /api/image/id/
-        </div>
-        <div class="row info">
-          Returns the image with the id
-        </div>
-        <div class="row info">
-          JSON Data/Base64
+        <div class="column">
+          <div class="row info">
+            /api/image/id/
+          </div>
+          <div class="row info">
+            Returns the image with the id
+          </div>
+          <div class="row info">
+            JSON Data/Base64
+          </div>
         </div>
       </div>
       <h3>Total images {{total}}</h3>
