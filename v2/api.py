@@ -1,6 +1,7 @@
 import pymysql
 from flask import Flask
 from flask import jsonify
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ except Exception as e:
 
 @app.route("/", methods=['GET'])
 def index():
-    return("Yes")
+    return render_template("index.html")
 
 @app.route("/api/image/random/", methods=['GET'])
 def random():
@@ -35,7 +36,11 @@ def getById(id):
     id = db.escape(id)
     query = "SELECT * FROM images WHERE iid = {}".format(id)
     cur.execute(query)
-    return jsonify(cur.fetchone())
+    if cur.rowcount == 1:
+        val = cur.fetchone()
+    else:
+        val = {"error": "No entrys found!"}
+    return jsonify(val)
 
 def main():
     app.run(debug=True)

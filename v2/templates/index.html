@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+
+      * {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      html, body {
+        margin: 0;
+      }
+
+      .container {
+        width: 40%;
+        margin: auto;
+      }
+
+      .column {
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+      }
+
+      .row {
+        padding: 8px;
+        border: 2px solid black;
+        word-wrap: break-word;
+      }
+
+      .header {
+        background-color: gray;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>This API is simply EPIC!</h1>
+      <div class="column">
+        <div class="row header">
+          API route
+        </div>
+        <div class="row header">
+          Purpose
+        </div>
+        <div class="row header">
+          Return value
+        </div>
+      </div>
+      <div class="column">
+        <div class="row">
+          /api/image/random/
+        </div>
+        <div class="row">
+          Returns a random image
+        </div>
+        <div class="row">
+          JSON Data
+        </div>
+      </div>
+      <div class="column">
+        <div class="row">
+          /api/image/id/
+        </div>
+        <div class="row">
+          Returns the image with the id
+        </div>
+        <div class="row">
+          JSON Data
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
