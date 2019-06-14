@@ -160,6 +160,7 @@ class Download:
             for (image, comment) in zip(posts['images'], posts['comments']):
                 t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
                 t[i].start()
+                t[i].join()
                 i += 1
 
         i = 0
@@ -193,8 +194,7 @@ class Download:
                         pass
                 except Exception as e:
                     print("[-] Writing file failed")
-                    self.data_images.pop(image)
-                print("[+] Done writing file {}".format(path))
+                #print("[+] Done writing file {}".format(path))
             else:
                 print("[!] Skipping file {}, exists".format(path))
 
@@ -219,6 +219,7 @@ class Download:
                 insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
                 self.cur.execute(insert_query)
             except Exception as e:
+                print(e)
                 print("[-] DB Insert failed!")
         else:
             print("[!] Skipping None file")

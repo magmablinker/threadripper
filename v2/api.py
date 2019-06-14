@@ -32,7 +32,10 @@ def random():
     cur.execute(query)
     val = cur.fetchone()
     val = [ v for v in val ]
-    val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+    try:
+        val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+    except Exception as e:
+        random()
     return jsonify(val)
 
 @app.route("/api/image/<id>", methods=['GET'])
@@ -43,7 +46,11 @@ def getById(id):
     if cur.rowcount == 1:
         val = cur.fetchone()
         val = [ v for v in val ]
-        val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+        try:
+            val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+        except Exception as e:
+            id = int(id.replace("'", "")) + 1
+            getById(id)
     else:
         val = {"error": "No entrys found!"}
     return jsonify(val)
