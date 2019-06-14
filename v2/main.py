@@ -161,6 +161,8 @@ class Download:
                 t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
                 t[i].start()
                 t[i].join()
+                print("[+] Images left {}".format(self.length))
+                self.length -= 1
                 i += 1
 
         i = 0
@@ -183,7 +185,6 @@ class Download:
             path = "images/" + board + "/" + threads + "/" + filename
 
             if not os.path.exists(path) and not os.path.isfile(path):
-                print("[+] Writing image {} to file".format(path))
                 try:
                     res = requests.get(url, stream=True)
 
@@ -194,7 +195,6 @@ class Download:
                         pass
                 except Exception as e:
                     print("[-] Writing file failed")
-                #print("[+] Done writing file {}".format(path))
             else:
                 print("[!] Skipping file {}, exists".format(path))
 

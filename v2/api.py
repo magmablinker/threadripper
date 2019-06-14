@@ -24,7 +24,8 @@ except Exception as e:
 
 @app.route("/", methods=['GET'])
 def index():
-    return render_template("index.html")
+    total = getTotalImages()
+    return render_template("index.html", total=total[0])
 
 @app.route("/api/image/random/", methods=['GET'])
 def random():
@@ -54,6 +55,11 @@ def getById(id):
     else:
         val = {"error": "No entrys found!"}
     return jsonify(val)
+
+def getTotalImages():
+    query = "SELECT COUNT(iid) FROM images"
+    cur.execute(query)
+    return cur.fetchone()
 
 def main():
     app.run(debug=True)
