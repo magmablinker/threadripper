@@ -42,14 +42,14 @@
         justify-content: center;
         margin-bottom: 16px;
         background-color: rgba(0, 0, 120, 0.8);
-        border-bottom: 4px solid white;
+        border-bottom: 4px solid purple;
         /*background-image: url("{{ url_for('static', filename='img/head.png') }}")*/
       }
 
       .container {
         width: 40%;
         margin: auto;
-        background-color: rgba(0, 83, 100, 0.7);
+        background-color: rgba(0, 83, 100, 0.9);
         padding: 12px;
         border-radius: 16px;
       }
@@ -93,7 +93,7 @@
       .info,
       .header {
         border: 2px solid white;
-        border-radius: 32px;
+        border-radius: 18px;
         margin: 4px;
       }
 
@@ -235,7 +235,7 @@
   </head>
   <body>
     <div class="head">
-      <h1>Random Image API!</h1>
+      <h1>Random Image API</h1>
     </div>
     <div class="container">
       <div class="api-info">
@@ -341,6 +341,11 @@
           }, 100);
         } else if (e.keyCode == "27") {
           closeModal();
+        } else if (e.keyCode == "82") { // Random
+          loadData("http://127.0.0.1:5000/api/image/random/");
+          window.setTimeout(function() {
+            loadImage();
+          }, 100);
         }
 
       }
