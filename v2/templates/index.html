@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Random Image</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
@@ -55,8 +56,8 @@
       }
 
       .container-image {
-        width: 740px;
-        height: 500px;
+        max-width: 740px;
+        height: 450px;
         margin: auto;
         margin-top: 10%;
       }
@@ -230,6 +231,12 @@
         color: #bbb;
         text-decoration: none;
         cursor: pointer;
+      }
+
+      @media only screen and (max-width: 800px) {
+        .container {
+          width: 95%;
+        }
       }
     </style>
   </head>
