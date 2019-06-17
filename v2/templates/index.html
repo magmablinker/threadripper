@@ -21,9 +21,11 @@
       }
 
       body {
-        /*background-image: url("{{ url_for('static', filename='img/body.jpg') }}");*/
-        background-image: url("{{ url_for('static', filename='img/b4.jpeg') }}");
-        background-position: center;
+        background: url("{{ url_for('static', filename='img/b4.jpeg') }}") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
         background-color: black;
       }
 
@@ -40,8 +42,8 @@
       .container {
         width: 40%;
         margin: auto;
-        margin-top: 1%;
-        margin-bottom: 1%;
+        margin-top: 64px;
+        margin-bottom: 64px;
         background-color: rgba(0, 83, 100, 0.9);
         padding: 12px;
         border-radius: 16px;
@@ -208,15 +210,6 @@
         cursor: pointer;
       }
 
-      @media only screen and (max-width: 800px) {
-        .container {
-          width: 95%;
-        }
-        .modal-content {
-          width: 100%;
-        }
-      }
-
       @media only screen and (max-width: 1600px) {
         h1 {
           padding: 4px;
@@ -234,6 +227,18 @@
         #img {
           max-height: 90%;
           max-width: 90%;
+        }
+      }
+      @media only screen and (max-width: 800px) {
+        .container {
+          width: 90%;
+          margin-top: 10%;
+        }
+        .modal-content {
+          width: 100%;
+        }
+        #img {
+          margin-top: 5%;
         }
       }
     </style>
@@ -304,6 +309,11 @@
           </div>
           <div class="row info">
             JSON Data/Base64
+          </div>
+        </div>
+        <div class="column large">
+          <div class="row info">
+            Max requests 1r/s
           </div>
         </div>
       </div>

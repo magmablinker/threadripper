@@ -1,28 +1,51 @@
 import pymysql
 import base64
+import os
 from flask import Flask
 from flask import jsonify
 from flask import render_template
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+limiter = Limiter(app, key_func=get_remote_address)
 
-try:
-    db = pymysql.connect(
-              host="localhost",
-              user="threadripper",
-              passwd="1337",
-              db="threadrip",
-              port=3306,
-              autocommit=True
-         )
-    cur = db.cursor()
-except Exception as e:
-    print("=-=-=ERROR=-=-=",
-          "DB CONN FAILED!!",
-          "=-=-=-=-=-=-=-=", sep="\n")
-    exit(1)
+class DB:
+    conn = None
+
+    def connect(self):
+        try:
+            self.conn = pymysql.connect(
+                      host="localhost",
+                      user="threadripper",
+                      passwd="1337",
+                      db="threadrip",
+                      port=3306,
+                      autocommit=True
+                 )
+        except Exception as e:
+            print("=-=-=ERROR=-=-=",
+                  "DB CONN FAILED!!",
+                  "=-=-=-=-=-=-=-=", sep="\n")
+            exit(1)
+
+    def query(self, query):
+        try:
+            cur = self.conn.cursor()
+            cur.execute(query)
+        except Exception as e:
+            self.connect()
+            cur = self.conn.cursor()
+            cur.execute(query)
+        return cur
+
+    def escape(self, value):
+        return self.conn.escape(value)
+
+db = DB()
 
 @app.route("/", methods=['GET'])
+@limiter.limit("1/second")
 def index():
     total = getTotalImages()
     return render_template("index.html", total=total[0])
@@ -30,20 +53,23 @@ def index():
 @app.route("/api/image/random/", methods=['GET'])
 def random():
     query = "SELECT * FROM images ORDER BY RAND() LIMIT 1"
-    cur.execute(query)
-    val = cur.fetchone()
+    val = db.query(query).fetchone()
     val = [ v for v in val ]
     try:
-        val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+        if os.path.exists(val[2]) and os.path.isfile(val[2]):
+            val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+        else:
+            return random()
     except Exception as e:
-        random()
+        return random()
     return jsonify(val)
 
 @app.route("/api/image/<id>", methods=['GET'])
+@limiter.limit("1/second")
 def getById(id):
     id = db.escape(id)
     query = "SELECT * FROM images WHERE iid = {}".format(id)
-    cur.execute(query)
+    cur = db.query(query)
     if cur.rowcount == 1:
         val = cur.fetchone()
         val = [ v for v in val ]
@@ -57,17 +83,17 @@ def getById(id):
     return jsonify(val)
 
 @app.route("/api/comment/random", methods=['GET'])
+@limiter.limit("1/second")
 def getRandomComment():
     query = "SELECT * FROM comments ORDER BY RAND() LIMIT 1"
-    cur.execute(query)
-    return jsonify(cur.fetchone())
+    return jsonify(db.query(query).fetchone())
 
 def getTotalImages():
     query = "SELECT COUNT(iid) FROM images"
-    cur.execute(query)
-    return cur.fetchone()
+    return db.query(query).fetchone()
 
 def main():
+    limiter.init_app(app)
     app.run(debug=True)
 
 if __name__ == "__main__":
