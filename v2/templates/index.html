@@ -246,6 +246,32 @@
   <body>
     <div class="container">
       <h1>Random Image API</h1>
+      <h3>Total images {{total}}</h3>
+      <div class="column large">
+        <div class="row nopadding">
+          <div class="container-image">
+            <img id="img" src="" alt="Random Picture">
+          </div>
+        </div>
+        <div class="column large">
+          <div class="row">
+            <button class="btn l" type="button" name="button" onclick="loadData('http://127.0.0.1:5000/api/image/random/')">Suprise me</button>
+          </div>
+        </div>
+        <div class="column medium">
+          <div class="row">
+            <button class="btn controll" type="button" name="button" onclick="newImage(1);">Previous</button>
+          </div>
+          <div class="row">
+            <button class="btn controll" type="button" name="button" onclick="newImage(0);">Next</button>
+          </div>
+        </div>
+      </div>
+      <div class="column large">
+        <div class="row">
+          <button id="btn-info" class="btn l" type="button" name="button" onclick="showinfo();">Display API info</button>
+        </div>
+      </div>
       <div class="api-info" id="ainfo">
         <div class="column colored">
           <div class="row header">
@@ -278,32 +304,6 @@
           </div>
           <div class="row info">
             JSON Data/Base64
-          </div>
-        </div>
-      </div>
-      <div class="column large">
-        <div class="row">
-          <button id="btn-info" class="btn l" type="button" name="button" onclick="showinfo();">Display API info</button>
-        </div>
-      </div>
-      <h3>Total images {{total}}</h3>
-      <div class="column large">
-        <div class="row nopadding">
-          <div class="container-image">
-            <img id="img" src="" alt="Random Picture">
-          </div>
-        </div>
-        <div class="column large">
-          <div class="row">
-            <button class="btn l" type="button" name="button" onclick="loadData('http://127.0.0.1:5000/api/image/random/')">Suprise me</button>
-          </div>
-        </div>
-        <div class="column medium">
-          <div class="row">
-            <button class="btn controll" type="button" name="button" onclick="newImage(1);">Previous</button>
-          </div>
-          <div class="row">
-            <button class="btn controll" type="button" name="button" onclick="newImage(0);">Next</button>
           </div>
         </div>
       </div>

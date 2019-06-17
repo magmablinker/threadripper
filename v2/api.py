@@ -56,6 +56,12 @@ def getById(id):
         val = {"error": "No entrys found!"}
     return jsonify(val)
 
+@app.route("/api/comment/random", methods=['GET'])
+def getRandomComment():
+    query = "SELECT * FROM comments ORDER BY RAND() LIMIT 1"
+    cur.execute(query)
+    return jsonify(cur.fetchone())
+
 def getTotalImages():
     query = "SELECT COUNT(iid) FROM images"
     cur.execute(query)
