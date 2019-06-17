@@ -1,10 +1,8 @@
 import requests
 import threading
 import os
-import re
 import shutil
 import pymysql
-from pprint import pprint
 from time import sleep
 
 os.system("cls")
@@ -27,9 +25,7 @@ class Download:
                     )
             self.cur = self.db.cursor()
         except Exception as e:
-            print("=-=-=ERROR=-=-=",
-                  "DB CONN FAILED!!",
-                  "=-=-=-=-=-=-=-=", sep="\n")
+            self.displayMessage(1, "The DB connection failed!")
             exit(1)
 
     def fetchImages(self):
@@ -49,25 +45,18 @@ class Download:
             try:
                 result = requests.get(url)
             except Exception as e:
-                print("=-=-=ERROR=-=-=",
-                      "Fetching data for board {} failed, skipping".format(board),
-                      "=-=-=-=-=-=-=-=", sep="\n")
+                self.displayMessage(1, "Fetching data for board {} failed, skipping".format(board))
                 continue
 
             if result.status_code != 200:
-                print("=-=-=ERROR=-=-=",
-                      "Fetching board /{}/ returned stauts code {}".format(board, result.status_code),
-                      "=-=-=-=-=-=-=-=", sep="\n")
+                self.displayMessage(1, "Fetching board /{}/ returned stauts code {}".format(board, result.status_code))
                 continue
 
             result = result.json()
 
             self.data_threads[board] = [ thread for thread in result["threads"] if "cock" not in thread["posts"][0]["semantic_url"] and "dick" not in thread["posts"][0]["semantic_url"] and "trap" not in thread["posts"][0]["semantic_url"] ]
 
-            print(
-                "***************************************************",
-                "Done fetching data for /{}/, sleeping one second".format(board),
-                "***************************************************", sep="\n")
+            self.displayMessage(0, "Done fetching data for /{}/, sleeping one second".format(board))
 
             sleep(1)
 
@@ -82,9 +71,7 @@ class Download:
                 try:
                     result = requests.get(url)
                 except Exception as e:
-                    print("=-=-=ERROR=-=-=",
-                          "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"][0]["no"], board),
-                          "=-=-=-=-=-=-=-=", sep="\n")
+                    self.displayMessage(1, "Fetching images for thread {} on board {} failed, skipping".format(thread["posts"][0]["no"], board))
                     continue
 
                 if result.status_code != 200:
@@ -94,6 +81,7 @@ class Download:
 
                 files = []
                 comments = []
+                i = 0
 
                 for post in result['posts']:
                     if "tim" in post:
@@ -110,22 +98,21 @@ class Download:
 
                     self.length += 1
 
+                    i += 1
+
                 self.data_images[thread_name] = {}
                 self.data_images[thread_name]['images'] = files
                 self.data_images[thread_name]['comments'] = comments
 
                 # Insert query
-                print("[+] Inserting {} into DB".format(int(thread["posts"][0]["no"])))
+                self.displayMessage(0, "Inserting {} into DB".format(int(thread["posts"][0]["no"])))
                 try:
                     insert_query = "INSERT INTO threads(thread_no, thread_title) VALUES({}, '{}')".format(int(thread["posts"][0]["no"]), thread["posts"][0]["semantic_url"])
                     self.cur.execute(insert_query)
                 except Exception as e:
-                    print("[!] Post exists in database or failed!")
+                    self.displayMessage(2, "Post exists in database or insert failed!")
 
-            print(
-                "***************************************************",
-                "Done fetching data for thread {} on board /{}/".format(thread_name, board),
-                "***************************************************", sep="\n")
+                self.displayMessage(3, "Done fetching data for thread {} on board /{}/".format(thread_name, board))
 
     def createDirectories(self):
         i = 0
@@ -137,20 +124,14 @@ class Download:
                         try:
                             os.makedirs(dir_name)
                         except Exception as e:
-                            print("=-=-=ERROR=-=-=",
-                                  "Making directory {} failed".format(dir_name),
-                                  "=-=-=-=-=-=-=-=", sep="\n")
+                            self.displayMessage(1, "Making directory {} failed".format(dir_name))
                             continue
 
                 i += 1
 
     def downloadImages(self):
         self.createDirectories()
-
-        print("******************************************",
-              "Found {} images, downloading in 2 seconds.".format(self.length),
-              "******************************************", sep="\n")
-
+        self.displayMessage(3, "Found {} images, downloading in 2 seconds.".format(self.length))
         sleep(2)
 
         i = 0
@@ -160,8 +141,9 @@ class Download:
             for (image, comment) in zip(posts['images'], posts['comments']):
                 t.append(threading.Thread(target=self.writeImages, args=(image, comment, threads,)))
                 t[i].start()
-                t[i].join()
-                print("[+] Images left {}".format(self.length))
+                if (i%10) == 0:
+                    t[i].join()
+                self.displayMessage(3, "Images left {}".format(self.length))
                 self.length -= 1
                 i += 1
 
@@ -171,8 +153,8 @@ class Download:
             for (image, comment) in zip(posts['images'], posts['comments']):
                 self.insertIntoDB(image, comment, threads, i)
                 i += 1
-        print("[+] Inserts done, some files may still be processing")
-        print("[+] Closing database connection")
+        self.displayMessage(3, "Inserts done, some files may still be processing")
+        self.displayMessage(0, "Closing database connection")
         self.cur.close()
 
     def writeImages(self, image, comment, threads):
@@ -194,9 +176,9 @@ class Download:
                     else:
                         pass
                 except Exception as e:
-                    print("[-] Writing file failed")
+                    self.displayMessage(1, "Writing file failed")
             else:
-                print("[!] Skipping file {}, exists".format(path))
+                self.displayMessage(2, "Skipping file {}, exists".format(path))
 
     def insertIntoDB(self, image, comment, threads, i):
         if image != None:
@@ -206,7 +188,7 @@ class Download:
             threadno = int(threads[0:threads.find("-")])
             path = "images/" + board + "/" + threads + "/" + filename
 
-            print("[+] Inserting image {} into db".format(path))
+            self.displayMessage(0, "Inserting image {} into db".format(path))
             try:
                 insert_query = "INSERT INTO comments(tid, comment) VALUES({}, '{}')".format(threadno, comment)
                 self.cur.execute(insert_query)
@@ -219,22 +201,22 @@ class Download:
                 insert_query = "INSERT INTO images(cid, image) VALUES({}, '{}')".format(int(cid), path)
                 self.cur.execute(insert_query)
             except Exception as e:
-                print(e)
-                print("[-] DB Insert failed!")
+                self.displayMessage(1, "Insert for {} failed!".format(path))
         else:
-            print("[!] Skipping None file")
+            self.displayMessage(3, "Skipping None file.")
 
-    def displayMessage(self, type, error):
-        types = [ 0, 1, 2 ] # 0 = Succes; 1 = Error; 2 = Warning
-        strToType = [ "Success", "Error", "Warning" ]
+    def displayMessage(self, type, message):
+        types = [ 0, 1, 2, 3 ] # 0 = Succes; 1 = Error; 2 = Warning; 3 = Info
+        numToType = [ "[+]", "[-]", "[!]", "[?]" ]
 
         if type not in types:
-            print("Wrong usage!")
+            self.displayMessage(1, "Wrong usage!")
             return False
 
+        print("******************************************",
+              "{} {}".format(numToType[type], message),
+              "******************************************\n", sep="\n")
 
-
-        pass
 
 def main():
     # Create new instance
