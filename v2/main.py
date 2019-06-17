@@ -5,7 +5,10 @@ import shutil
 import pymysql
 from time import sleep
 
-os.system("cls")
+if os.name == "nt": # Check if Windows or Linux
+    os.system("cls")
+else:
+    os.system("clear")
 
 class Download:
     def __init__(self):
@@ -178,7 +181,7 @@ class Download:
                 except Exception as e:
                     self.displayMessage(1, "Writing file failed")
             else:
-                self.displayMessage(2, "Skipping file {}, exists".format(path))
+                self.displayMessage(2, "Skipping file {}".format(path))
 
     def insertIntoDB(self, image, comment, threads, i):
         if image != None:

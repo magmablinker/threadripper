@@ -11,8 +11,10 @@ function loadData(url) {
       window.jsondata = JSON.parse(this.responseText);
       const b64 = jsondata[3];
       var img = document.getElementById("img");
-      img.setAttribute('src', "data:image/jpg;base64," + b64)
-      img.setAttribute('alt', window.jsondata[2])
+      var cap = document.getElementById("caption");
+      caption.innerHTML = window.jsondata[2];
+      img.setAttribute('alt', window.jsondata[2]);
+      img.setAttribute('src', "data:image/jpg;base64," + b64);
     }
   };
 }

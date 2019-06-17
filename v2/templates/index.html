@@ -28,7 +28,7 @@
       }
 
       h1 {
-        padding: 16px;
+        padding: 8px;
       }
 
       h3 {
@@ -37,19 +37,11 @@
         margin-bottom: -50px;
       }
 
-      .head {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 16px;
-        background-color: rgba(0, 0, 120, 0.8);
-        border-bottom: 4px solid purple;
-        /*background-image: url("{{ url_for('static', filename='img/head.png') }}")*/
-      }
-
       .container {
         width: 40%;
         margin: auto;
+        margin-top: 1%;
+        margin-bottom: 1%;
         background-color: rgba(0, 83, 100, 0.9);
         padding: 12px;
         border-radius: 16px;
@@ -79,6 +71,7 @@
         background-color: rgba(0, 0, 230, 0.5);
         border-radius: 16px;
         padding: 4px;
+        display: none;
       }
 
       .row {
@@ -91,16 +84,10 @@
         margin: 0;
       }
 
-      .info,
-      .header {
+      .info {
         border: 2px solid white;
         border-radius: 18px;
         margin: 4px;
-      }
-
-      .header {
-        background-color: rgba(0, 0, 139, 0.8);
-        font-weight: bold;
       }
 
       .info {
@@ -231,12 +218,15 @@
       }
 
       @media only screen and (max-width: 1600px) {
+        h1 {
+          padding: 4px;
+        }
         .container {
           width: 60%;
         }
         .container-image {
           max-width: 440px;
-          height: 350px;
+          height: 320px;
         }
         .api-info {
 
@@ -247,13 +237,16 @@
         }
       }
     </style>
+    <script type="text/javascript">
+      window.onerror = function(message, url, lineNumber) {
+          return true; // prevents browser error messages
+      };
+    </script>
   </head>
   <body>
-    <div class="head">
-      <h1>Random Image API</h1>
-    </div>
     <div class="container">
-      <div class="api-info">
+      <h1>Random Image API</h1>
+      <div class="api-info" id="ainfo">
         <div class="column colored">
           <div class="row header">
             API route
@@ -286,6 +279,11 @@
           <div class="row info">
             JSON Data/Base64
           </div>
+        </div>
+      </div>
+      <div class="column large">
+        <div class="row">
+          <button id="btn-info" class="btn l" type="button" name="button" onclick="showinfo();">Display API info</button>
         </div>
       </div>
       <h3>Total images {{total}}</h3>
@@ -348,22 +346,38 @@
           newImage(1);
           window.setTimeout(function() {
             loadImage();
-          }, 100);
+          }, 200);
         } else if (e.keyCode == "39") {
           newImage(0);
           window.setTimeout(function() {
             loadImage();
-          }, 100);
+          }, 200);
         } else if (e.keyCode == "27") {
           closeModal();
         } else if (e.keyCode == "82") { // Random
           loadData("http://127.0.0.1:5000/api/image/random/");
           window.setTimeout(function() {
             loadImage();
-          }, 100);
+          }, 200);
         }
-
       }
+
+      function showinfo() {
+        var btn_info = document.getElementById("btn-info");
+        var api_info = document.getElementById("ainfo");
+        api_info.style.display = "block";
+        btn_info.innerHTML = "Hide API info"
+        btn_info.onclick = function() { hideinfo(); }
+      }
+
+      function hideinfo() {
+        var btn_info = document.getElementById("btn-info");
+        var api_info = document.getElementById("ainfo");
+        api_info.style.display = "none";
+        btn_info.innerHTML = "Display API info"
+        btn_info.onclick = function() { showinfo(); }
+      }
+
     </script>
   </body>
 </html>
