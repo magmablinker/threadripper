@@ -43,6 +43,7 @@ class DB:
         return self.conn.escape(value)
 
 db = DB()
+db.connect()
 
 @app.route("/", methods=['GET'])
 @limiter.limit("1/second")
@@ -58,6 +59,7 @@ def random():
     try:
         if os.path.exists(val[2]) and os.path.isfile(val[2]):
             val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+            val[2] = val[2][(val[2].rfind("/")+1):]
         else:
             return random()
     except Exception as e:
@@ -75,6 +77,7 @@ def getById(id):
         val = [ v for v in val ]
         try:
             val.append(base64.b64encode(open(val[2], "rb").read()).decode("UTF-8"))
+            val[2] = val[2][(val[2].rfind("/")+1):]
         except Exception as e:
             id = int(id.replace("'", "")) + 1
             getById(id)
