@@ -78,6 +78,7 @@ class Download:
                     continue
 
                 if result.status_code != 200:
+                    self.displayMessage(1, "{} returned {}".format(url, result.status_code))
                     continue
 
                 result = result.json()
